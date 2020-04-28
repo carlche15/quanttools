@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="quanttools", # Replace with your own username
-    version="0.0.1",
+    version="0.0.2",
     author="carl",
     author_email="",
     description="A small example package",

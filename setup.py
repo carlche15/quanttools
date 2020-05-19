@@ -9,7 +9,7 @@ setuptools.setup(
     author="Carl Che",
     author_email="",
     description="A quantitative finance/ data science tool package",
-    install_requires=['numpy', 'scipy', 'matplotlib'],
+    install_requires=['numpy', 'scipy', 'matplsdsdsdotlib'],
 
     url="https://github.com/carlche15/quanttools.git",
     packages=setuptools.find_packages(),

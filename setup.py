@@ -5,12 +5,12 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="quanttools", # Replace with your own username
-    version="0.0.2",
-    author="carl",
+    version="0.0.0",
+    author="Carl Che",
     author_email="",
-    description="A small example package",
+    description="A quantitative finance/ data science tool package",
 
-    url="",
+    url="https://github.com/carlche15/quanttools.git",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

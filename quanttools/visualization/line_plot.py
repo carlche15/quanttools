@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from quanttools.statistics.data_process import winsorize
 
-
+# todo: change font
 
 
 def two_axis_plot(_data, d1, d2, target_var_1, target_var_2, weights = None, title=None, plot_diff=False, **kwargs):
@@ -42,20 +42,23 @@ def two_axis_plot(_data, d1, d2, target_var_1, target_var_2, weights = None, tit
     ax.tick_params(axis='both', which='major', labelsize=kwargs.get('labelsize',20))
     ax.set_ylabel(f"{target_var_1}/{target_var_2}",fontsize=kwargs.get('fontsize',24))
     plt.show()
+    return fig
 
 
 def one_axis_avg(data, bucket_var, target_var, weights=None):
+
     """
     compute the average of the target variable along the bucket variable.
 
     """
     distinct_bucket_interval = len(np.unique(data[bucket_var]))  # distinct number of x-axis variable
+
     # if the number of distinct feature values is greater than 100, create 20 even cut buckets for it.
     # (because it would be undesirable to grouby by so many values)
     # if the number of distinct feature values is less than 100, group directly by feature values
     if distinct_bucket_interval > 100:
 
-        data = winsorize(data, bucket_var=(1,99))
+        data = winsorize(data, **{bucket_var:(1,99)})
         bucket = data.groupby( pd.cut(data[bucket_var], 30)).apply(lambda x: np.average(x[target_var], weights=x[weights] if weights else np.ones(len(x))) if len(x)>50 else np.nan)
         bucket.index = [i.mid for i in bucket.index]
     else:

@@ -1,7 +1,14 @@
 import numpy as np
 from quanttools.fixed_income_valuation import main_settings
 
-class Swaption_G2:
+
+
+
+
+
+
+
+class swaption_g2:
     """
 
     Price a swaption by a numerical integration of a closed-form function. Function and data members within this class
@@ -273,7 +280,6 @@ class Swaption_G2:
         from scipy.stats import norm
 
         h1 = self.h1(x)
-
         integrand_part_1 = np.exp(-0.5 * ((x - self.param["miu_x"]) / self.param["sigma_x"]) ** 2) / (
                     self.param["sigma_x"] * np.sqrt(2 * np.pi))
         integrand_part_2 = norm.cdf(-1 * self.omega * h1) - np.sum(

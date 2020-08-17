@@ -96,27 +96,27 @@ class LineFitter():
 
 
 
+if __name__ == "__main__":
 
 
-
-epsilon = 50
-xs =[0,0.5,1,2,3]
-ys = [3,2.75,1.55,0.2,0.1]
-init_param = [-5,-1]
-fig,ax1 = plt.subplots(figsize=(20,10))
-
-
-###### base line function ###############
-# todo : move this inside
-burnout_function = FunctionBody(init_param,cost_func=FittingEngine.rmse_cost, optimizer=FittingEngine.optimize)
-burnout_function.fit(xs,ys)
-baseline, = ax1.plot(np.linspace(xs[0],xs[-1],100),burnout_function(np.linspace(xs[0],xs[-1],100)),'--',lw=4,color="gray")
-plotline, = ax1.plot(np.linspace(xs[0],xs[-1],100),burnout_function(np.linspace(xs[0],xs[-1],100)),lw=4,color="royalblue")
-pivot_line,= ax1.plot(xs,burnout_function(xs), "-o",color="royalblue", markersize=25,lw=0)
+    epsilon = 50
+    xs =[0,0.5,1,2,3]
+    ys = [3,2.75,1.55,0.2,0.1]
+    init_param = [-5,-1]
+    fig,ax1 = plt.subplots(figsize=(20,10))
 
 
-#########plotting engine############
-lc = LineFitter(pivot_line,burnout_function,finer_plot=True, plotline=plotline)
-lc.connect()
+    ###### base line function ###############
+    # todo : move this inside
+    burnout_function = FunctionBody(init_param,cost_func=FittingEngine.rmse_cost, optimizer=FittingEngine.optimize)
+    burnout_function.fit(xs,ys)
+    baseline, = ax1.plot(np.linspace(xs[0],xs[-1],100),burnout_function(np.linspace(xs[0],xs[-1],100)),'--',lw=4,color="gray")
+    plotline, = ax1.plot(np.linspace(xs[0],xs[-1],100),burnout_function(np.linspace(xs[0],xs[-1],100)),lw=4,color="royalblue")
+    pivot_line,= ax1.plot(xs,burnout_function(xs), "-o",color="royalblue", markersize=25,lw=0)
 
-plt.show()
+
+    #########plotting engine############
+    lc = LineFitter(pivot_line,burnout_function,finer_plot=True, plotline=plotline)
+    lc.connect()
+
+    plt.show()

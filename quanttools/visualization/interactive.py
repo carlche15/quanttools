@@ -21,7 +21,7 @@ if __name__ == "__main__":
     ys = [3,2.75,1.55,0.2,0.1]
     fig,ax1 = plt.subplots(figsize=(6,6))
 
- 
+
     ###### base line function ###############
     # todo : move this inside
     burnout_function = FunctionBody(*burnout_inputs)

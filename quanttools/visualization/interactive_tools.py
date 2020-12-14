@@ -1,68 +1,14 @@
-#
-#
-import matplotlib.pyplot as plt
+
 import numpy as np
 from scipy.optimize import fmin
-from matplotlib.widgets import Slider
 import copy
-class FittingEngine():
-
-    @staticmethod
-    def rmse_cost(parameters, func, xs, ys, **kwargs):
-        line_fit = func(parameters, xs, **kwargs)
-        true = ys
-        return np.sqrt(np.mean((line_fit - true) ** 2))
-
-    @staticmethod
-    def optimize(init_pram,cost_func, func, xs, ys):
-        res = fmin(cost_func, x0=init_pram, args=(func, xs, ys,), disp=False)
-        return res
-
-class FunctionBody():
-    # todo :abstract
-
-    def __init__(self, func,pivot_x, base_y,init_param, cost_func = None, optimizer = None):
-        #todo : identify length of parameter
-        self.func = copy.copy(func)
-        self.pivot_x, self.base_y = pivot_x, base_y
-        self.init_param = init_param
-        self.cost_func = cost_func if cost_func is not None else FittingEngine.rmse_cost
-        self.optimizer = optimizer if optimizer is not None else FittingEngine.optimize
-        self.calibrated_param = self.fit(self.pivot_x,self.base_y)
-
-    def __call__(self, xs):
-        return self.func(self.calibrated_param,xs)
-
-
-    def fit(self, xs,ys):
-        self.calibrated_param = self.optimizer(self.init_param,self.cost_func,self.func,xs,ys)
-        return self.calibrated_param
-
-    def creat_2D_line(self, ax):
-        """
-        create 2 line plots on a given matplotlib axis and return the corresponding Lind2D object
-        :param function: a function map x to y
-        :param ax: axis on which lines are created
-        :return: 0. （NOT RETURNED）the base-line for the function (gray-dash-line), this line is fixed all the time
-                 1. Scatter ("bo" type line)  for x,y pairs, these points will become movable
-                 2. Line plots for the function. This line will be updated based on the latest position of line 1
-
-        """
-        # todo: hard-coded 100, color,.etc
-        domain = np.linspace(self.pivot_x[0], self.pivot_x[-1], 100)
-        param = self.calibrated_param
-        baseline, = ax.plot(domain, self.func(param,domain), '--', lw=4,color="gray")
-        pivot_line, = ax.plot(self.pivot_x, self.func(param,self.pivot_x), "-o", color="royalblue", markersize=25, lw=0)
-        plotline, = ax.plot(domain, self.func(param, domain), lw=4, color="royalblue")
-        return  pivot_line,plotline
-
 
 class LineFitter():
 
-    def __init__(self,func, pivotline, plotline, task_handler = None):
+    def __init__(self,func, pivotline, plotline, task_handler = None, task = None):
         # TODO: Keep this class as seperate as possible from function body class!
         """
-        By default, when the mouse is released, the task_handler.run() will be called
+        When the mouse is released, the task_handler.run() will be called
         """
         self.func = func
         self.pivot_line = pivotline
@@ -71,8 +17,9 @@ class LineFitter():
         self.pivot_ydata= pivotline.get_ydata()
         self.trackingidx = None # None or the idx that is being tracking
 
-        self.text_var = self.plotline.figure.axes[0].text(1.6, 3, "Real time parameter:", fontsize=20) # todo: tidy this
+        # self.text_var = self.plotline.figure.axes[0].text(1.6, 3, "Real time parameter:", fontsize=20) # todo: tidy this
         self.task_handler = task_handler
+        self.task = task if task is not None else self.func
 
     def connect(self):
 
@@ -81,10 +28,10 @@ class LineFitter():
         self.cid_release = self.pivot_line.figure.canvas.mpl_connect('button_release_event', self.release_click)
 
 
-    def on_click(self, event, eps = 1): # precision default to
+    def on_click(self, event): # precision default to
         if event.inaxes is None:return # outside the box
-
         dist = np.hypot(self.pivot_line.get_xdata() - event.xdata, self.pivot_line.get_ydata() - event.ydata)
+        eps = np.mean(np.diff(self.pivot_line.get_xdata()))/5  # click precision set to be 1/5 of average distance between pivot x points.
         if np.amin(dist) < eps:
 
             self.trackingidx = np.argmin(dist)
@@ -108,15 +55,20 @@ class LineFitter():
 
         #### update pivot line
         self.pivot_line.set_ydata(self.pivot_ydata)
-        self.text_var.set_text(f"Real time parameter: {self.func.calibrated_param}")
+        # self.text_var.set_text(f"Real time parameter: {self.func.calibrated_param}")
         self.pivot_line.figure.canvas.draw()
 
 
     def release_click(self,event):
 
-        if self.task_handler is not None and self.trackingidx is not None:
+
+        if self.task_handler is not None and self.task is not None and self.trackingidx is not None:
             print(f"Re-computing based on index movement {self.trackingidx}....")
-            self.task_handler.run(self.func.calibrated_param)
+            # func satisfies f(x)->y
+            print(self.func.calibrated_param)
+            self.task_handler.run(self.task)
 
         self.trackingidx = None
+
+
 

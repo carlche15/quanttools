@@ -28,7 +28,7 @@ class MpHandler:
         self.pools = Pool(8, initializer=init_process, initargs=(mp_arr,))
         print("_______ MPH initialized! :D ______")
 
-    def run(self,func):
+    def run(self,func,event):
         st = time.time()
         idx = [(i, func, ) for i in range(8)]
         self.pools.starmap(single_run, idx)

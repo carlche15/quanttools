@@ -61,3 +61,34 @@ class FunctionMapping():
         ax.set_title(f"{self.id}")
         return  pivot_line,plotline
 
+    def update(self,plotter):
+        self.fit(plotter.pivot_xdata,plotter.pivot_ydata)
+        return plotter.pivot_ydata, self(np.linspace(self.pivot_x[0], self.pivot_x[-1], 100))
+
+
+        #
+        # ####update plot line
+        # self.plotline.set_ydata(self(self.plotline.get_xdata()))
+        # self.plotline.figure.canvas.draw()
+        #
+        # #### update pivot line
+        # self.pivot_line.set_ydata(self.pivot_ydata)
+        # # self.text_var.set_text(f"Real time parameter: {self.func.calibrated_param}")
+        # self.pivot_line.figure.canvas.draw()
+    #
+    #
+    #
+    #
+    #     #######
+    #     self.func.fit(self.pivot_xdata, self.pivot_ydata)
+    #     updated_plot_yvals = self.func(self.plotline.get_xdata())
+    #
+    #     ####update plot line
+    #     self.plotline.set_ydata(updated_plot_yvals)
+    #     self.plotline.figure.canvas.draw()
+    #
+    #     #### update pivot line
+    #     self.pivot_line.set_ydata(self.pivot_ydata)
+    #     # self.text_var.set_text(f"Real time parameter: {self.func.calibrated_param}")
+    #     self.pivot_line.figure.canvas.draw()
+

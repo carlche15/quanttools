@@ -51,8 +51,10 @@ if __name__ == "__main__":
 
 
     #########plotting engine############
-    lc = LineFitter(model.burnout_function, *model.burnout_function.creat_2D_line(ax1),task_handler=mph,task = model)
-    lc2 = LineFitter(model.seasoning_function, *model.seasoning_function.creat_2D_line(ax2),task_handler=mph, task = model)
+    lc = LineFitter(*model.burnout_function.creat_2D_line(ax1),move_task=model.burnout_function.update,
+                    release_handler=mph.run,release_task = model)
+    lc2 = LineFitter(*model.seasoning_function.creat_2D_line(ax2),move_task=model.seasoning_function.update,
+                     release_handler=mph.run, release_task = model)
     lc.connect()
     lc2.connect()
 

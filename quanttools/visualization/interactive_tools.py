@@ -5,12 +5,14 @@ import copy
 
 class LineFitter():
 
-    def __init__(self,func, pivotline, plotline, task_handler = None, task = None):
+    def __init__(self, pivotline, plotline,
+                 click_handler = None, click_task = None,
+                 move_handler = None, move_task = None,
+                 release_handler = None, release_task = None):
         # TODO: Keep this class as seperate as possible from function body class!
         """
         When the mouse is released, the task_handler.run() will be called
         """
-        self.func = func
         self.pivot_line = pivotline
         self.plotline = plotline
         self.pivot_xdata =pivotline.get_xdata() # a very good example for seperation
@@ -18,14 +20,28 @@ class LineFitter():
         self.trackingidx = None # None or the idx that is being tracking
 
         # self.text_var = self.plotline.figure.axes[0].text(1.6, 3, "Real time parameter:", fontsize=20) # todo: tidy this
-        self.task_handler = task_handler
-        self.task = task if task is not None else self.func
+        self.click_handler = click_handler
+        self.click_task = click_task
+        self.move_handler = move_handler
+        self.move_task = move_task
+        self.release_handler = release_handler
+        self.release_task = release_task
 
     def connect(self):
 
         self.cid_click = self.pivot_line.figure.canvas.mpl_connect('button_press_event', self.on_click)
         self.cid_movie = self.pivot_line.figure.canvas.mpl_connect('motion_notify_event', self.tracking_mouse)
         self.cid_release = self.pivot_line.figure.canvas.mpl_connect('button_release_event', self.release_click)
+
+    def _run_task(self, handler, task):
+        if task is None:
+            return
+        else:
+            if handler is not None:
+                return handler(task,self)
+            else:
+
+                return task(self)
 
 
     def on_click(self, event): # precision default to
@@ -36,6 +52,7 @@ class LineFitter():
 
             self.trackingidx = np.argmin(dist)
         else: return
+        self._run_task(self.click_handler, self.click_task)
 
     def tracking_mouse(self,event):
 
@@ -44,29 +61,26 @@ class LineFitter():
         if event.inaxes is None: return  # outside the box
         self.pivot_ydata[self.trackingidx] = event.ydata
 
+        # self.run_task(self.move_handler,self.move_task)
+
         #######
-        self.func.fit(self.pivot_xdata, self.pivot_ydata)
-        updated_plot_yvals = self.func(self.plotline.get_xdata())
-
-
-        ####update plot line
-        self.plotline.set_ydata(updated_plot_yvals)
-        self.plotline.figure.canvas.draw()
-
-        #### update pivot line
-        self.pivot_line.set_ydata(self.pivot_ydata)
+        pivot_y, plot_y = self._run_task(self.move_handler, self.move_task)
+        self.plotline.set_ydata(plot_y)
+        self.pivot_line.set_ydata(pivot_y)
         # self.text_var.set_text(f"Real time parameter: {self.func.calibrated_param}")
+
+        self.plotline.figure.canvas.draw()
         self.pivot_line.figure.canvas.draw()
+
+
 
 
     def release_click(self,event):
 
-
-        if self.task_handler is not None and self.task is not None and self.trackingidx is not None:
+        if self.trackingidx is not None:
             print(f"Re-computing based on index movement {self.trackingidx}....")
-            # func satisfies f(x)->y
-            print(self.func.calibrated_param)
-            self.task_handler.run(self.task)
+
+            self._run_task(self.release_handler, self.release_task)
 
         self.trackingidx = None
 
